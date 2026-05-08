@@ -27,6 +27,30 @@ struct TradeDetailView: View {
     @ViewBuilder
     private func content(for trade: Trade) -> some View {
         List {
+            Section("Rules to follow") {
+                ForEach(TradeRules.rules(for: trade.type, goal: trade.goal)) { rule in
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                        Text(rule.text)
+                    }
+                }
+            }
+
+            Section("Purchases") {
+                ForEach(trade.purchases.sorted(by: { $0.date < $1.date })) { purchase in
+                    HStack {
+                        Text(purchase.date, format: .dateTime.day().month().year())
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(purchase.price, format: .currency(code: "USD"))
+                        Text("× \(purchase.quantity, format: .number)")
+                            .foregroundStyle(.secondary)
+                    }
+                    .font(.subheadline)
+                }
+            }
+
             Section("Position") {
                 LabeledContent("Ticker", value: trade.ticker)
                 LabeledContent("Type", value: trade.type.rawValue)
@@ -47,30 +71,6 @@ struct TradeDetailView: View {
                 }
                 LabeledContent("Buy Date") {
                     Text(trade.buyDate, format: .dateTime.day().month().year())
-                }
-            }
-
-            Section("Purchases") {
-                ForEach(trade.purchases.sorted(by: { $0.date < $1.date })) { purchase in
-                    HStack {
-                        Text(purchase.date, format: .dateTime.day().month().year())
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(purchase.price, format: .currency(code: "USD"))
-                        Text("× \(purchase.quantity, format: .number)")
-                            .foregroundStyle(.secondary)
-                    }
-                    .font(.subheadline)
-                }
-            }
-
-            Section("Rules to follow") {
-                ForEach(TradeRules.rules(for: trade.type, goal: trade.goal)) { rule in
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                        Text(rule.text)
-                    }
                 }
             }
         }

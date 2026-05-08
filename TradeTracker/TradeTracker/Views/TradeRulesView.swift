@@ -59,5 +59,5 @@ struct TradeRulesView: View {
 }
 
 #Preview {
-    TradeRulesView(type: .stock, goal: .growthRightSide) {}
+    TradeRulesView(type: .stockAndIndexETF, goal: .growthRightSide) {}
 }

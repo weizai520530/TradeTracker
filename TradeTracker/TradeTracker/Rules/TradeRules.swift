@@ -10,34 +10,65 @@ struct TradeRule: Identifiable, Hashable {
 }
 
 enum TradeRules {
+
+    static func isAllowed(type: TickerType, goal: TradeGoal) -> Bool {
+        switch (type, goal) {
+        case (.leveragedETFShort, .growthLeftSide),
+             (.option,            .growthLeftSide),
+             (.leveragedETFShort, .growthRightSide),
+             (.option,            .momentumShort):
+            return false
+        default:
+            return true
+        }
+    }
+
     static func rules(for type: TickerType, goal: TradeGoal) -> [TradeRule] {
-        var rules: [TradeRule] = [
-            TradeRule("I have set a clear stop price and will respect it."),
-            TradeRule("Position size is appropriate for my account."),
-        ]
+        switch (type, goal) {
 
-        switch goal {
-        case .growthLeftSide:
-            rules.append(TradeRule("Buying ahead of confirmation — accept higher rejection risk."))
-            rules.append(TradeRule("Plan: scale in if thesis holds, exit fast if invalidated."))
-        case .growthRightSide:
-            rules.append(TradeRule("Wait for breakout confirmation before adding."))
-            rules.append(TradeRule("Trail stop under most recent higher low."))
-        case .momentumShort:
-            rules.append(TradeRule("This is a short-term bet — define an exit window."))
-            rules.append(TradeRule("Cut losses fast; momentum can reverse without warning."))
+        case (.stockAndIndexETF, .growthLeftSide),
+             (.leveragedETFLong, .growthLeftSide):
+            return [
+                TradeRule("EMA is below 20/50/200."),
+                TradeRule("BB is below the lower band."),
+                TradeRule("Candle & indicators divergence appears."),
+                TradeRule("Signs of a flat bottom are present."),
+                TradeRule("Potential growth points/views identified."),
+            ]
+
+        case (.stockAndIndexETF, .growthRightSide),
+             (.leveragedETFLong, .growthRightSide):
+            return [
+                TradeRule("EMA 8/20 is rising and crosses EMA 50/200 above 0 and below upper band."),
+                TradeRule("BB trend is above 0 and below upper band."),
+                TradeRule("Confirmed info (news, recent earnings) on growing phase."),
+            ]
+
+        case (.option, .growthRightSide):
+            return [
+                TradeRule("Leap-Call only (1 month & above)."),
+                TradeRule("EMA 8/20 is rising and crosses EMA 50/200 above 0 and below upper band."),
+                TradeRule("BB trend is above 0 and below upper band."),
+                TradeRule("Confirmed info (news, recent earnings) on growing phase."),
+            ]
+
+        case (.stockAndIndexETF, .momentumShort),
+             (.leveragedETFLong, .momentumShort):
+            return [
+                TradeRule("Clear rising EMA trend confirmed."),
+                TradeRule("Near confirmed positive news."),
+                TradeRule("5-day holding limit acknowledged."),
+            ]
+
+        case (.leveragedETFShort, .momentumShort):
+            return [
+                TradeRule("BB is above the upper band."),
+                TradeRule("Clear divergence signal in candle trend with BB shrinking volume."),
+                TradeRule("Elliott Wave down trend signal present (Wave 2/4, or correction wave a & c)."),
+            ]
+
+        default:
+            return []
         }
-
-        switch type {
-        case .stock:
-            break
-        case .etf:
-            rules.append(TradeRule("Considered the underlying sector / index drivers."))
-        case .option:
-            rules.append(TradeRule("Account for time decay — set a time-based exit."))
-            rules.append(TradeRule("Avoid earnings unless explicitly part of the thesis."))
-        }
-
-        return rules
     }
 }

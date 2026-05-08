@@ -7,7 +7,7 @@ struct NewTradeView: View {
 
     @State private var ticker = ""
     @State private var sector: Sector = .technology
-    @State private var type: TickerType = .stock
+    @State private var type: TickerType = .stockAndIndexETF
     @State private var goal: TradeGoal = .growthRightSide
     @State private var buyPriceText = ""
     @State private var quantityText = ""
@@ -15,6 +15,7 @@ struct NewTradeView: View {
     @State private var stopPriceText = ""
 
     @State private var showingRules = false
+    @State private var showingNotAllowed = false
 
     private var buyPrice: Double? { Double(buyPriceText) }
     private var quantity: Double? { Double(quantityText) }
@@ -66,7 +67,7 @@ struct NewTradeView: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Next") { showingRules = true }
+                    Button("Next") { handleNext() }
                         .disabled(!isValid)
                 }
             }
@@ -75,7 +76,20 @@ struct NewTradeView: View {
                     confirmTrade()
                 }
             }
+            .alert("Trade Not Allowed", isPresented: $showingNotAllowed) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("\(type.rawValue) + \(goal.rawValue) is not allowed in the current strategy.")
+            }
         }
+    }
+
+    private func handleNext() {
+        guard TradeRules.isAllowed(type: type, goal: goal) else {
+            showingNotAllowed = true
+            return
+        }
+        showingRules = true
     }
 
     private func confirmTrade() {

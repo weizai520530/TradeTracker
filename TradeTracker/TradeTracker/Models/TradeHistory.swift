@@ -45,7 +45,7 @@ final class TradeHistory {
     }
 
     var sector: Sector { Sector(rawValue: sectorRaw) ?? .other }
-    var type: TickerType { TickerType(rawValue: typeRaw) ?? .stock }
+    var type: TickerType { TickerType(rawValue: typeRaw) ?? .stockAndIndexETF }
     var goal: TradeGoal { TradeGoal(rawValue: goalRaw) ?? .growthRightSide }
 
     var profitLoss: Double { (exitPrice - averageBuyPrice) * quantity }

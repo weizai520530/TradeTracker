@@ -1,8 +1,9 @@
 import Foundation
 
 enum TickerType: String, Codable, CaseIterable, Identifiable {
-    case stock = "Stock"
-    case etf = "ETF"
+    case stockAndIndexETF = "Stocks & Index ETFs"
+    case leveragedETFLong = "Leveraged ETFs (Long)"
+    case leveragedETFShort = "Leveraged ETFs (Short)"
     case option = "Option"
     var id: String { rawValue }
 }
