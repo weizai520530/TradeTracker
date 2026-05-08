@@ -11,6 +11,19 @@ struct TradeRule: Identifiable, Hashable {
 
 enum TradeRules {
 
+    static func stopLossPercent(for type: TickerType) -> Double {
+        switch type {
+        case .stockAndIndexETF:  return 0.30
+        case .leveragedETFLong:  return 0.20
+        case .leveragedETFShort: return 0.20
+        case .option:            return 0.50
+        }
+    }
+
+    static func suggestedStopPrice(buyPrice: Double, type: TickerType) -> Double {
+        buyPrice * (1 - stopLossPercent(for: type))
+    }
+
     static func isAllowed(type: TickerType, goal: TradeGoal) -> Bool {
         switch (type, goal) {
         case (.leveragedETFShort, .growthLeftSide),

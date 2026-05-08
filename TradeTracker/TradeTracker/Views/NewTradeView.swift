@@ -13,14 +13,26 @@ struct NewTradeView: View {
     @State private var quantityText = ""
     @State private var priceTargetText = ""
     @State private var stopPriceText = ""
+    @State private var lastAutoStop = ""
 
     @State private var showingRules = false
     @State private var showingNotAllowed = false
+    @State private var showingStopTooLow = false
 
     private var buyPrice: Double? { Double(buyPriceText) }
     private var quantity: Double? { Double(quantityText) }
     private var priceTarget: Double? { Double(priceTargetText) }
     private var stopPrice: Double? { Double(stopPriceText) }
+
+    private var autoStopPrice: Double? {
+        guard let bp = buyPrice, bp > 0 else { return nil }
+        return TradeRules.suggestedStopPrice(buyPrice: bp, type: type)
+    }
+
+    private var stopBelowAuto: Bool {
+        guard let auto = autoStopPrice, let user = stopPrice else { return false }
+        return user < auto
+    }
 
     private var isValid: Bool {
         !ticker.trimmingCharacters(in: .whitespaces).isEmpty
@@ -58,6 +70,21 @@ struct NewTradeView: View {
                         .keyboardType(.decimalPad)
                     TextField("Stop Price", text: $stopPriceText)
                         .keyboardType(.decimalPad)
+                    if let auto = autoStopPrice {
+                        if stopBelowAuto {
+                            Label {
+                                Text("Below \(auto, format: .currency(code: "USD")) — minimum for \(type.rawValue) (\(Int(TradeRules.stopLossPercent(for: type) * 100))% max loss)")
+                            } icon: {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                        } else {
+                            Text("Auto: \(auto, format: .currency(code: "USD")) (\(Int(TradeRules.stopLossPercent(for: type) * 100))% max loss for \(type.rawValue))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
             .navigationTitle("New Trade")
@@ -71,6 +98,8 @@ struct NewTradeView: View {
                         .disabled(!isValid)
                 }
             }
+            .onChange(of: buyPriceText) { _, _ in updateStopFromAuto() }
+            .onChange(of: type) { _, _ in updateStopFromAuto() }
             .sheet(isPresented: $showingRules) {
                 TradeRulesView(type: type, goal: goal) {
                     confirmTrade()
@@ -81,12 +110,32 @@ struct NewTradeView: View {
             } message: {
                 Text("\(type.rawValue) + \(goal.rawValue) is not allowed in the current strategy.")
             }
+            .alert("Stop Price is too low for current strategy", isPresented: $showingStopTooLow) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                if let auto = autoStopPrice {
+                    Text("Minimum allowed stop price is \(auto, format: .currency(code: "USD")) for \(type.rawValue) (\(Int(TradeRules.stopLossPercent(for: type) * 100))% max loss).")
+                }
+            }
         }
+    }
+
+    private func updateStopFromAuto() {
+        guard let auto = autoStopPrice else { return }
+        let autoText = String(format: "%.2f", auto)
+        if stopPriceText.isEmpty || stopPriceText == lastAutoStop {
+            stopPriceText = autoText
+        }
+        lastAutoStop = autoText
     }
 
     private func handleNext() {
         guard TradeRules.isAllowed(type: type, goal: goal) else {
             showingNotAllowed = true
+            return
+        }
+        if stopBelowAuto {
+            showingStopTooLow = true
             return
         }
         showingRules = true
