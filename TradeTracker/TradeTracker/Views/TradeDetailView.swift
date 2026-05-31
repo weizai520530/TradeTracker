@@ -88,16 +88,16 @@ struct TradeDetailView: View {
             }
         }
         .navigationTitle(trade.ticker)
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .leadingBar) {
                 Button(role: .destructive) {
                     showingQuit = true
                 } label: {
                     Label("Quit Trade", systemImage: "xmark.circle")
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .trailingBar) {
                 Button {
                     showingAdd = true
                 } label: {

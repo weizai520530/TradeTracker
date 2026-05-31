@@ -40,14 +40,14 @@ struct MainView: View {
             }
             .navigationTitle("Trades")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .leadingBar) {
                     Button {
                         showingHistory = true
                     } label: {
                         Label("History", systemImage: "clock.arrow.circlepath")
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .trailingBar) {
                     Button {
                         showingNewTrade = true
                     } label: {

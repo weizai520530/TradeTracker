@@ -47,7 +47,7 @@ struct NewTradeView: View {
             Form {
                 Section("Ticker") {
                     TextField("Symbol", text: $ticker)
-                        .textInputAutocapitalization(.characters)
+                        .uppercaseAutoInput()
                         .autocorrectionDisabled()
                     Picker("Sector", selection: $sector) {
                         ForEach(Sector.allCases) { Text($0.rawValue).tag($0) }
@@ -58,18 +58,18 @@ struct NewTradeView: View {
                 }
                 Section("Position") {
                     TextField("Buy Price", text: $buyPriceText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                     TextField("Quantity", text: $quantityText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                 }
                 Section("Strategy") {
                     Picker("Trade Goal", selection: $goal) {
                         ForEach(TradeGoal.allCases) { Text($0.rawValue).tag($0) }
                     }
                     TextField("Price Target", text: $priceTargetText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                     TextField("Stop Price", text: $stopPriceText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                     if let auto = autoStopPrice {
                         if stopBelowAuto {
                             Label {
@@ -88,7 +88,7 @@ struct NewTradeView: View {
                 }
             }
             .navigationTitle("New Trade")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -100,7 +100,7 @@ struct NewTradeView: View {
             }
             .onChange(of: buyPriceText) { _, _ in updateStopFromAuto() }
             .onChange(of: type) { _, _ in updateStopFromAuto() }
-            .sheet(isPresented: $showingRules) {
+            .navigationDestination(isPresented: $showingRules) {
                 TradeRulesView(type: type, goal: goal) {
                     confirmTrade()
                 }
@@ -118,6 +118,7 @@ struct NewTradeView: View {
                 }
             }
         }
+        .sheetSizing()
     }
 
     private func updateStopFromAuto() {

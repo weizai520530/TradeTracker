@@ -1,0 +1,37 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2E7BFF"/>
+      <stop offset="1" stop-color="#0B2E66"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#E8F1FF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect x="0" y="0" width="1024" height="1024" rx="228" ry="228" fill="url(#bg)"/>
+
+  <!-- Rising trend line with a checkmark dip-then-rise shape -->
+  <polyline
+    points="180,640 360,720 470,560 700,300"
+    fill="none"
+    stroke="url(#line)"
+    stroke-width="64"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Arrow head at the end of the trend line -->
+  <polyline
+    points="600,300 700,300 700,400"
+    fill="none"
+    stroke="url(#line)"
+    stroke-width="64"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Data dots along the line -->
+  <circle cx="360" cy="720" r="30" fill="#FFFFFF"/>
+  <circle cx="470" cy="560" r="30" fill="#FFFFFF"/>
+</svg>

@@ -22,9 +22,9 @@ struct AddPositionView: View {
             Form {
                 Section("Add to position") {
                     TextField("Buy Price", text: $buyPriceText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                     TextField("Quantity", text: $quantityText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                 }
                 Section("Reference") {
                     LabeledContent("Stop Price") {
@@ -40,7 +40,7 @@ struct AddPositionView: View {
                 }
             }
             .navigationTitle("Add Position")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -56,6 +56,7 @@ struct AddPositionView: View {
                 Text("Your intended buy price is below the stop price for this trade. Reconsider this position.")
             }
         }
+        .sheetSizing()
     }
 
     private func tryConfirm() {

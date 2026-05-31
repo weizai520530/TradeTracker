@@ -45,9 +45,9 @@ struct QuitTradeView: View {
 
                 Section("Exit") {
                     TextField("Exit Price", text: $exitPriceText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                     TextField("Quantity to Sell", text: $quantityText)
-                        .keyboardType(.decimalPad)
+                        .decimalKeyboard()
                 }
 
                 if let warning {
@@ -58,7 +58,7 @@ struct QuitTradeView: View {
                 }
             }
             .navigationTitle("Quit Trade")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -69,6 +69,7 @@ struct QuitTradeView: View {
                 }
             }
         }
+        .sheetSizing()
     }
 
     private func confirmSell() {
